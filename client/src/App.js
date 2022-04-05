@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Container, AppBar, Typography, Grow, Grid } from "@material-ui/core";
 import { useDispatch } from "react-redux";
 import { getPosts } from "./actions/posts";
@@ -10,10 +10,19 @@ import useStyles from "./styles";
 export default function App() {
   const classes = useStyles();
   const dispatch = useDispatch();
+  const [currentCardId, setCurrentCardId] = useState(0);
 
   useEffect(() => {
+    console.log("Use effect fired");
+
     dispatch(getPosts());
-  }, [dispatch]);
+  }, [currentCardId, dispatch]);
+
+  let handleUpdateCardIdState = (cardId) => {
+    console.log("Handle Update Clicked!");
+    console.log(cardId);
+    setCurrentCardId(cardId);
+  };
 
   return (
     <Container maxWidth="lg">
@@ -32,10 +41,13 @@ export default function App() {
         <Container>
           <Grid container justify="space-between" alignItems="stretch">
             <Grid item xs={12} sm={7}>
-              <Posts />
+              <Posts handleUpdateCardIdState={handleUpdateCardIdState} />
             </Grid>
             <Grid item xs={12} sm={4}>
-              <Form />
+              <Form
+                currentCardId={currentCardId}
+                handleUpdateCardIdState={handleUpdateCardIdState}
+              />
             </Grid>
           </Grid>
         </Container>

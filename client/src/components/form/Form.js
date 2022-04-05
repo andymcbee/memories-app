@@ -1,12 +1,12 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import FileBase from "react-file-base64";
-import { useDispatch } from "react-redux";
-import { createPost } from "../../actions/posts";
+import { useDispatch, useSelector } from "react-redux";
+import { createPost, updatePost } from "../../actions/posts";
 
 import { TextField, Button, Typography, Paper } from "@material-ui/core";
 import useStyles from "./styles";
 
-export default function Form() {
+export default function Form({ currentCardId, handleUpdateCardIdState }) {
   const [postData, setPostData] = useState({
     creator: "",
     title: "",
@@ -14,16 +14,39 @@ export default function Form() {
     tags: "",
     selectedFile: "",
   });
+  const post = useSelector((state) =>
+    currentCardId ? state.posts.find((p) => p._id === currentCardId) : null
+  );
   const classes = useStyles();
   const dispatch = useDispatch();
 
-  const handleSubmit = (e) => {
-    console.log("Ran");
-    e.preventDefault();
-    dispatch(createPost(postData));
+  useEffect(() => {
+    if (post) {
+      setPostData(post);
+    }
+  }, [post]);
+
+  const clear = () => {
+    handleUpdateCardIdState(0);
+    setPostData({
+      creator: "",
+      title: "",
+      message: "",
+      tags: "",
+      selectedFile: "",
+    });
   };
 
-  const clear = () => {};
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (currentCardId === 0) {
+      dispatch(createPost(postData));
+    } else {
+      dispatch(updatePost(currentCardId, postData));
+    }
+    clear();
+  };
 
   return (
     <Paper className={classes.paper}>
@@ -33,7 +56,9 @@ export default function Form() {
         className={`${classes.root} ${classes.form}`}
         onSubmit={handleSubmit}
       >
-        <Typography variant="h6">Creating a Memory</Typography>
+        <Typography variant="h6">
+          {post ? "Update a Memory" : "Creating a Memory"}
+        </Typography>
         <TextField
           name="creator"
           variant="outlined"
@@ -68,7 +93,9 @@ export default function Form() {
           label="Tags"
           fullWidth
           value={postData.tags}
-          onChange={(e) => setPostData({ ...postData, tags: e.target.value })}
+          onChange={(e) =>
+            setPostData({ ...postData, tags: e.target.value.split(",") })
+          }
         />
         <div className={classes.fileInput}>
           <FileBase
@@ -87,7 +114,7 @@ export default function Form() {
           type="submit"
           fullWidth
         >
-          Submit
+          {post ? "Update" : "Submit"}
         </Button>
         <Button
           variant="contained"
