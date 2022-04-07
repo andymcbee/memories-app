@@ -17,6 +17,7 @@ export default function Navbar() {
   useEffect(() => {
     const token = user?.token;
     setUser(JSON.parse(localStorage.getItem("profile")));
+    console.log(user);
   }, [location]);
 
   const logout = () => {
@@ -45,13 +46,13 @@ export default function Navbar() {
           <div className={classes.profile}>
             <Avatar
               className={classes.purple}
-              alt={user?.result.name}
+              alt={user?.result.firstName}
               src={user?.result.imageUrl}
             >
-              {user?.result.name.charAt(0)}
+              {user?.result.firstName.charAt(0)}
             </Avatar>
             <Typography className={classes.userName} variant="h6">
-              {user?.result.name}
+              {user?.result.firstName}
             </Typography>
             <Button
               variant="contained"
