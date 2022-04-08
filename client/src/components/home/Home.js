@@ -12,7 +12,7 @@ import useStyles from "./styles";
 import Form from "../form/Form";
 import Posts from "../posts/Posts";
 import { useDispatch } from "react-redux";
-import { getPosts, getPostsBySearch } from "../../actions/posts";
+import { getPostsBySearch } from "../../actions/posts";
 import Pagination from "../pagination/Pagination";
 import { useHistory, useLocation } from "react-router-dom";
 import ChipInput from "material-ui-chip-input";
@@ -31,12 +31,6 @@ export default function Home() {
   const searchQuery = query.get("searchQuery");
   const [search, setSearch] = useState("");
   const [tags, setTags] = useState([]);
-
-  useEffect(() => {
-    console.log("Use effect fired");
-
-    dispatch(getPosts());
-  }, [currentCardId, dispatch]);
 
   let handleUpdateCardIdState = (cardId) => {
     console.log("Handle Update Clicked!");
@@ -117,9 +111,11 @@ export default function Home() {
                 currentCardId={currentCardId}
                 handleUpdateCardIdState={handleUpdateCardIdState}
               />
-              <Paper elevation={6}>
-                <Pagination />
-              </Paper>
+              {!searchQuery && !tags.length && (
+                <Paper elevation={6}>
+                  <Pagination page={page} className={classes.pagination} />
+                </Paper>
+              )}
             </Grid>
           </Grid>
         </Container>

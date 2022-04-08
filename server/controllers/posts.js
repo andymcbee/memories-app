@@ -6,10 +6,27 @@ import PostMessage from "../models/postMessage.js";
 //Get posts
 
 export const getPosts = async (req, res) => {
+  const { page } = req.query;
   try {
-    const postMessages = await PostMessage.find();
-    console.log(postMessages);
-    res.status(200).json(postMessages);
+    //how many results to return per page
+    const LIMIT = 8;
+    //Find the first index value for current page.
+    // -1 is to get to zero (Eg. page 1 = zero index. not 1 index.)
+    const startIndex = (Number(page) - 1) * LIMIT;
+    //find total number of posts so we can show proper pagination numbers.
+    const total = await PostMessage.countDocuments({});
+    //sort by oldest to newest: .sort({_id: -1})
+    // limit number of returned results: .limit(LIMIT)
+    //Skip all posts and start at the current startIndex: .skip(startIndex)
+    const posts = await PostMessage.find()
+      .sort({ _id: -1 })
+      .limit(LIMIT)
+      .skip(startIndex);
+    res.status(200).json({
+      data: posts,
+      currentPage: Number(page),
+      numberOfPages: Math.ceil(total / LIMIT),
+    });
   } catch (error) {
     res.status(404).json({ message: error });
   }

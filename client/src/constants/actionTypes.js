@@ -10,3 +10,9 @@ export const LIKE_POST = "LIKE_POST";
 //auth
 export const AUTH = "AUTH";
 export const LOGOUT = "LOGOUT";
+
+//loading
+
+export const START_LOADING = "START_LOADING";
+
+export const END_LOADING = "END_LOADING";
