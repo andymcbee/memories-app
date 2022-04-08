@@ -5,6 +5,7 @@ import memories from "../../images/memories.png";
 import useStyles from "./styles";
 import { useDispatch } from "react-redux";
 import * as actionType from "../../constants/actionTypes";
+import decode from "jwt-decode";
 
 export default function Navbar() {
   const classes = useStyles();
@@ -16,8 +17,16 @@ export default function Navbar() {
 
   useEffect(() => {
     const token = user?.token;
+
+    if (token) {
+      const decodedToken = decode(token);
+      //check and see if exp value (in milliseconds) is less than 1000. If so, log out.
+      if (decodedToken.exp * 1000 < new Date().getTime()) {
+        logout();
+      }
+    }
+
     setUser(JSON.parse(localStorage.getItem("profile")));
-    console.log(user);
   }, [location]);
 
   const logout = () => {
@@ -26,7 +35,6 @@ export default function Navbar() {
     setUser(null);
   };
 
-  console.log(user);
   return (
     <AppBar className={classes.appBar} position="static" color="inherit">
       <div className={classes.brandContainer}>

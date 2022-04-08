@@ -8,7 +8,6 @@ import useStyles from "./styles";
 
 export default function Form({ currentCardId, handleUpdateCardIdState }) {
   const [postData, setPostData] = useState({
-    creator: "",
     title: "",
     message: "",
     tags: "",
@@ -19,6 +18,7 @@ export default function Form({ currentCardId, handleUpdateCardIdState }) {
   );
   const classes = useStyles();
   const dispatch = useDispatch();
+  const user = JSON.parse(localStorage.getItem("profile"));
 
   useEffect(() => {
     if (post) {
@@ -29,7 +29,6 @@ export default function Form({ currentCardId, handleUpdateCardIdState }) {
   const clear = () => {
     handleUpdateCardIdState(0);
     setPostData({
-      creator: "",
       title: "",
       message: "",
       tags: "",
@@ -41,12 +40,22 @@ export default function Form({ currentCardId, handleUpdateCardIdState }) {
     e.preventDefault();
 
     if (currentCardId === 0) {
-      dispatch(createPost(postData));
+      dispatch(createPost({ ...postData, name: user?.result?.firstName }));
     } else {
       dispatch(updatePost(currentCardId, postData));
     }
     clear();
   };
+
+  if (!user?.result?.firstName) {
+    return (
+      <Paper className={classes.paper}>
+        <Typography variant="h6" align="center">
+          Please sign in to create a memory
+        </Typography>
+      </Paper>
+    );
+  }
 
   return (
     <Paper className={classes.paper}>
@@ -59,16 +68,7 @@ export default function Form({ currentCardId, handleUpdateCardIdState }) {
         <Typography variant="h6">
           {post ? "Update a Memory" : "Creating a Memory"}
         </Typography>
-        <TextField
-          name="creator"
-          variant="outlined"
-          label="Creator"
-          fullWidth
-          value={postData.creator}
-          onChange={(e) =>
-            setPostData({ ...postData, creator: e.target.value })
-          }
-        />
+
         <TextField
           name="title"
           variant="outlined"
